@@ -1,0 +1,120 @@
+<!doctype html>
+<html>
+
+  <head>
+
+    <link rel="stylesheet" type="text/css" href="mini.css"/>
+
+    <script type="text/javascript" src="jssm.iife.js"></script>
+    <script type="text/javascript" src="jssm-viz.es5.cjs.js"></script>
+
+    <script defer type="text/javascript">
+
+      const viz = require('jssm-viz');
+
+      // an easy way to write state machines as if they were constructed from strings
+      // const foo = sm`...`;
+      // jssm is scoped globally by jssm.iife.js
+      const sm = jssm.sm;
+
+      // how long to wait after each color state, in ms
+      const delayAfter = {
+        Off : 2000,
+        GR  : 6000,
+        YR  : 2500,
+        RR  : 1500,
+        RG  : 6000,
+        RY  : 2500,
+        RR2 : 1500
+      };
+
+      // get stuff out of the dom easily
+      const byId = id => document.getElementById(id);
+
+
+
+      // here's the actual state machine
+      const light = sm`
+        Off 'proceed' -> RR2;
+
+        RR2 'proceed' => GR
+            'proceed' => YR
+            'proceed' => RR
+            'proceed' => RG
+            'proceed' => RY
+            'proceed' => RR2;
+      `;
+
+      // move the state machine one step then wait to update the diagram
+      let was;
+      function updateLastTimeWas() {
+        was = (new Date()).getTime();
+      }
+
+      // this is the update loop for the machine's actions
+      // when called, look up the delay, wait that long, call for a proceed, change the last update time, and
+      // call for another delayed action
+      function nextStepEventually() {
+        window.setTimeout(function() {
+          updateLastTimeWas();
+          light.action('proceed');
+          nextStepEventually();
+        }, delayAfter[light.state()]);
+      }
+
+
+
+      // update the diagram
+      function updateScreen() {
+        byId('light_grid').className = light.state();                   // this changes the class on the table, which sets light colors through the css
+        byId('c').innerHTML          = light.state();                   // this sets the center cell to the state text
+        byId('svg_box').innerHTML    = viz.dot_to_svg(viz.dot(light));  // this updates the flowchart diagram
+
+        // this is that little timer box
+        byId('announce').innerHTML   = `${light.state()} for ${delayAfter[light.state()]} ms (${delayAfter[light.state()] - ((new Date()).getTime() - was)})`;
+      }
+
+
+
+      // how to handle the initial page load
+      function onload() {
+        constantScreenUpdates();
+        updateLastTimeWas();
+        nextStepEventually();
+      }
+
+      // this will update the screen every screen frame.  this is not involved with the state machine
+      function constantScreenUpdates() {
+        updateScreen();
+        window.requestAnimationFrame(constantScreenUpdates);
+      }
+
+      // hook the browser saying things are loaded, then start
+      window.addEventListener('DOMContentLoaded', onload);
+
+    </script>
+
+  </head>
+
+
+
+  <body>
+
+    <!-- this draws the four lights and the state in the middle -->
+    <table id="light_grid">
+      <tr>   <td></td>                         <td id="n" class="circle"> </td>   <td></td>                         </tr>
+      <tr>   <td id="w" class="circle"></td>   <td id="c"></td>                   <td id="e" class="circle"></td>   </tr>
+      <tr>   <td></td>                         <td id="s" class="circle"></td>    <td></td>                         </tr>
+    </table>
+
+    <!-- the text underneath -->
+    <div id="announce"></div>
+
+    <!-- the flowchart diagram -->
+    <div id="svg_box"></div>
+
+  </body>
+
+
+
+</html>

@@ -1,0 +1,38 @@
+
+body    { padding: 2em; }
+table   { border-collapse: collapse; margin-bottom: 2em; }
+td      { width: 3em; height: 3em; line-height: 100%; margin: 0; padding: 0; vertical-align: middle; text-align: center; }
+
+/* this is where it says "GR for 2000 ms" */
+#announce        { margin-bottom: 5em; }
+
+/* just how a circle is drawn in CSS */
+.circle          { border-radius: 50%; }
+
+/* when in off, all circles are black */
+.Off .circle     { background-color: black; }
+
+
+
+/* From here down is how the light colors are controlled.
+   All the script has to do is set .GR or whatever on the <table> */
+
+/* when in GR, north circle is green, south is green; etc */
+.GR #n,  .GR #s  { background-color: green;   }
+.YR #n,  .YR #s  { background-color: gold;    }
+.RR #n,  .RR #s  { background-color: red;     }
+
+/* when in RG, north is darkred, south is darkred; etc */
+.RG  #n, .RG  #s { background-color: darkred; }
+.RY  #n, .RY  #s { background-color: darkred; }
+.RR2 #n, .RR2 #s { background-color: darkred; }
+
+/* when in GR, east is darkred, west is darkred; etc */
+.GR #e,  .GR #w  { background-color: darkred; }
+.YR #e,  .YR #w  { background-color: darkred; }
+.RR #e,  .RR #w  { background-color: darkred; }
+
+/* when in RG, east is green, west is green; etc */
+.RG  #e, .RG  #w { background-color: green;   }
+.RY  #e, .RY  #w { background-color: gold;    }
+.RR2 #e, .RR2 #w { background-color: red;     }
